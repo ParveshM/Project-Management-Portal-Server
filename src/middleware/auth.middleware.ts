@@ -8,7 +8,7 @@ import { JwtUserPayload, ROLES } from "../types";
 declare global {
   namespace Express {
     interface Request {
-      user?: any;
+      user: Pick<JwtUserPayload, "id" | "username" | "role">;
     }
   }
 }
@@ -33,13 +33,13 @@ export default async function authenticateUser(
     req.user = user;
     next();
   } catch (error) {
-    next(new CustomError("Token is not valid", HttpStatus.FORBIDDEN));
+    next(new CustomError("Token is not valid/expired", HttpStatus.FORBIDDEN));
   }
 }
 
-export const autherizeRole = (role: ROLES) => {
+export const requireRoles = (roles: ROLES[]) => {
   return (req: Request, res: Response, next: NextFunction) => {
-    if (req.user.role !== role) {
+    if (!roles.includes(req.user.role)) {
       return next(
         new CustomError(
           "Permission denied, you are not authorized to access this route",

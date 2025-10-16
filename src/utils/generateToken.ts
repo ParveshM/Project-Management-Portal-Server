@@ -1,8 +1,8 @@
 import jwt from "jsonwebtoken";
-import ENV from "../config/ENV.js";
-import { ROLES } from "../types/index.js";
+import { ROLES } from "../types";
+import ENV from "../config/ENV";
 type JWTPayload = {
-  userName: string;
+  username: string;
   id: string;
   role: ROLES;
 };

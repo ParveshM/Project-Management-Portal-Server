@@ -1,9 +1,45 @@
 import express from "express";
-const userRouter = express.Router();
+import { loginValidation, registerValidation } from "../utils/validation";
+import { handleValidationErrors } from "../middleware/validator.middleware";
+import { UserController } from "../controller/user";
+import authenticateUser, { requireRoles } from "../middleware/auth.middleware";
+import { USER_ROLES } from "../types";
+const router = express.Router();
 
-/* GET users listing. */
-userRouter.get("/", function (req, res, next) {
-  res.send("respond with a resource");
-});
+/********* Auth routes *********/
+router.post(
+  "/login",
+  loginValidation,
+  handleValidationErrors,
+  UserController.loginUser
+);
+router.post(
+  "/register",
+  authenticateUser,
+  requireRoles([USER_ROLES.MANAGER, USER_ROLES.ADMIN]),
+  registerValidation,
+  handleValidationErrors,
+  UserController.registerUser
+);
 
-export default userRouter;
+router.patch(
+  "/:id",
+  authenticateUser,
+  requireRoles([USER_ROLES.MANAGER, USER_ROLES.ADMIN]),
+  UserController.updateUser
+);
+router.delete(
+  "/:id",
+  authenticateUser,
+  requireRoles([USER_ROLES.ADMIN]),
+  UserController.deleteUser
+);
+
+router.get(
+  "/statistics",
+  authenticateUser,
+  requireRoles([USER_ROLES.ADMIN]),
+  UserController.getUserStats
+);
+
+export default router;

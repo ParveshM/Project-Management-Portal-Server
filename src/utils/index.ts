@@ -1,3 +1,6 @@
+import { Response } from "express";
+import { HttpStatus } from "../types/HttpsStatus";
+
 interface QueryParams {
   page: number | string;
   limit: number | string;
@@ -44,3 +47,28 @@ export const buildQueryOptions = (params: QueryParams) => {
     limit: limitNum,
   };
 };
+
+interface SendResponseParams<T> {
+  res: Response;
+  status?: HttpStatus;
+  message: string;
+  data?: T;
+  success?: boolean;
+  [key: string]: any;
+}
+
+export function sendResponse<T>({
+  res,
+  status = HttpStatus.OK,
+  message,
+  data,
+  success = true,
+  ...rest
+}: SendResponseParams<T>): void {
+  res.status(status).json({
+    success,
+    message,
+    data,
+    ...rest,
+  });
+}

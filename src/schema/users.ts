@@ -1,9 +1,10 @@
 import mongoose, { Document, Schema, Model } from "mongoose";
 import { ROLES, USER_ROLES } from "../types";
+import { hashPassword } from "../utils/hashPass";
 
 export interface IUser extends Document {
   name: string;
-  userName: string;
+  username: string;
   password: string;
   role: ROLES;
   createdBy?: mongoose.Types.ObjectId;
@@ -17,7 +18,7 @@ const userSchema: Schema<IUser> = new mongoose.Schema(
       type: String,
       required: true,
     },
-    userName: {
+    username: {
       type: String,
       required: true,
     },
@@ -38,6 +39,11 @@ const userSchema: Schema<IUser> = new mongoose.Schema(
   { timestamps: true }
 );
 
-// 3. Export the model with type
+userSchema.pre("save", async function (next) {
+  if (this.isModified("password")) {
+    this.password = await hashPassword(this.password);
+  }
+  next();
+});
 const User: Model<IUser> = mongoose.model<IUser>("User", userSchema);
 export default User;

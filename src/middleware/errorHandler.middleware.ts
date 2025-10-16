@@ -8,6 +8,7 @@ const errorHandlingMidleware = (
   next: NextFunction
 ) => {
   err.statusCode = err.statusCode || 400;
+  console.error(err);
   if (err.statusCode === 404) {
     res.status(err.statusCode).json({ success: false, message: err.message });
   } else {

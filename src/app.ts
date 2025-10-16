@@ -2,14 +2,12 @@ import express, { Application } from "express";
 import morgan from "morgan";
 import cors from "cors";
 import ENV from "./config/ENV";
-// import connectDb from "./config/dbConnection";
 import CustomError from "./utils/customError";
 import userRouter from "./routes/users";
 import connectDb from "./config";
 import { HttpStatus } from "./types/HttpsStatus";
 import errorHandlingMidleware from "./middleware/errorHandler.middleware";
-// import { HttpStatus } from "./types/HttpStatus";
-// import errorHandlingMidleware from "./middlewares/errorHandler";
+import { projectRouter } from "./routes/projects";
 
 const app: Application = express();
 
@@ -25,7 +23,8 @@ app.use(
 );
 app.use(morgan("dev"));
 app.use(express.json());
-app.use("/api", userRouter);
+app.use("/api/user", userRouter);
+app.use("/api/projects", projectRouter);
 
 app.all("*", (req, res, next) =>
   next(new CustomError(`Not found: ${req.url}`, HttpStatus.NOT_FOUND))
