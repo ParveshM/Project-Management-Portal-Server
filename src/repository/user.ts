@@ -11,7 +11,6 @@ export const UserDB = {
       ...(queryParam?.role && { filters: { role: queryParam.role } }),
       ...queryParam,
     });
-    console.log(query, limit, skip, sort);
     const data = await User.find(query)
       .sort(sort)
       .skip(skip)
