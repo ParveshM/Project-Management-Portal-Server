@@ -68,7 +68,10 @@ export const ProjectDB = {
         },
       },
     ]);
-    const { totalProject, projectByStatus } = result[0];
-    return { totalProject: totalProject[0].count, projectByStatus };
+    const { totalProject = [], projectByStatus = [] } = result[0] || {};
+    return {
+      totalProject: totalProject[0]?.count || 0,
+      projectByStatus,
+    };
   },
 };

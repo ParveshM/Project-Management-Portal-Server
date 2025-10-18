@@ -55,10 +55,10 @@ export const UserDB = {
         },
       },
     ]);
-    const { totalCount, dailyCounts } = result[0];
+    const { totalCount = [], dailyCounts = [] } = result[0] || {};
     return {
-      totalCount: totalCount[0].total,
-      dailyCounts: dailyCounts,
+      totalCount: totalCount[0]?.total || 0,
+      dailyCounts,
     };
   },
 };
