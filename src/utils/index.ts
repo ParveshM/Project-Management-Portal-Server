@@ -23,7 +23,7 @@ export const buildQueryOptions = (params: QueryParams) => {
   } = params;
 
   const pageNum = Math.max(Number(page) || 1, 1);
-  const limitNum = Math.max(Number(limit) || 10, 1);
+  const limitNum = Number(limit) || 10;
   const skip = (pageNum - 1) * limitNum;
 
   const query: Record<string, any> = { ...filters };
@@ -50,7 +50,7 @@ export const buildQueryOptions = (params: QueryParams) => {
 
 interface SendResponseParams<T> {
   res: Response;
-  status?: HttpStatus;
+  status?: number;
   message: string;
   data?: T;
   success?: boolean;

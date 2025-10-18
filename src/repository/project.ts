@@ -4,10 +4,14 @@ import { buildQueryOptions } from "../utils";
 export const ProjectDB = {
   createProject: (data: Partial<IProject>) => Project.create(data),
 
-  getAllProjects: async (queryParams: any) => {
+  getAllProjects: async ({
+    queryParams,
+  }: {
+    queryParams: Record<string, any>;
+  }) => {
     const { query, sort, skip, limit } = buildQueryOptions({
-      filters: queryParams.status ? { status: queryParams.status } : {},
       searchFields: ["name", "description"],
+      ...(queryParams?.status && { filters: { status: queryParams.status } }),
       ...queryParams,
     });
 
@@ -64,6 +68,7 @@ export const ProjectDB = {
         },
       },
     ]);
-    return result[0];
+    const { totalProject, projectByStatus } = result[0];
+    return { totalProject: totalProject[0].count, projectByStatus };
   },
 };

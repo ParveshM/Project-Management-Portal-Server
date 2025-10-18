@@ -34,7 +34,12 @@ router.delete(
   requireRoles([USER_ROLES.ADMIN]),
   UserController.deleteUser
 );
-
+router.get(
+  "/",
+  authenticateUser,
+  requireRoles([USER_ROLES.MANAGER, USER_ROLES.ADMIN]),
+  UserController.getAllUsers
+);
 router.get(
   "/statistics",
   authenticateUser,

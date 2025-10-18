@@ -43,7 +43,9 @@ export const ProjectController = {
    */
   getAllProjects: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { data, count } = await ProjectDB.getAllProjects(req.query);
+      const { data, count } = await ProjectDB.getAllProjects({
+        queryParams: req.query,
+      });
 
       sendResponse({
         res,

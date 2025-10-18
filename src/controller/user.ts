@@ -5,6 +5,7 @@ import { HttpStatus } from "../types/HttpsStatus";
 import { comparePassword } from "../utils/hashPass";
 import { generateToken } from "../utils/generateToken";
 import { sendResponse } from "../utils";
+import mongoose from "mongoose";
 
 export const UserController = {
   /**
@@ -13,8 +14,8 @@ export const UserController = {
    */
   loginUser: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { username, password } = req.body;
-      const existingUser = await UserDB.getUserByUsername(username);
+      const { username, password, role } = req.body;
+      const existingUser = await UserDB.getUserByUsername(username, role);
       if (!existingUser) {
         throw new CustomError("User not found", HttpStatus.BAD_REQUEST);
       }
@@ -37,7 +38,7 @@ export const UserController = {
         data: {
           token,
           user: {
-            id: existingUser._id as unknown as string,
+            _id: existingUser._id as unknown as string,
             name: existingUser.name,
             username: existingUser.username,
             role: existingUser.role,
@@ -56,11 +57,18 @@ export const UserController = {
   registerUser: async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { name, username, password, role } = req.body;
-      const existingUser = await UserDB.getUserByUsername(username);
+      const existingUser = await UserDB.getUserByUsername(username, role);
       if (existingUser) {
         throw new CustomError("User already exists", HttpStatus.BAD_REQUEST);
       }
-      const user = await UserDB.createUser({ name, username, password, role });
+      const createdBy = new mongoose.Types.ObjectId(req.user.id);
+      const user = await UserDB.createUser({
+        name,
+        username,
+        password,
+        role,
+        createdBy,
+      });
       sendResponse({ res, message: "User created successfully", data: user });
     } catch (error) {
       next(error);
@@ -73,7 +81,9 @@ export const UserController = {
    */
   getAllUsers: async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { data, count } = await UserDB.getAllUsers(req.query);
+      const { data, count } = await UserDB.getAllUsers({
+        queryParam: req.query,
+      });
       sendResponse({
         res,
         message: "Users fetched successfully",

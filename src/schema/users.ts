@@ -1,7 +1,7 @@
 import mongoose, { Document, Schema, Model } from "mongoose";
 import { ROLES, USER_ROLES } from "../types";
 import { hashPassword } from "../utils/hashPass";
-
+import { Query } from "mongoose";
 export interface IUser extends Document {
   name: string;
   username: string;
@@ -43,6 +43,20 @@ userSchema.pre("save", async function (next) {
   if (this.isModified("password")) {
     this.password = await hashPassword(this.password);
   }
+  next();
+});
+
+userSchema.pre<Query<IUser, IUser>>("findOneAndUpdate", async function (next) {
+  const update = this.getUpdate();
+
+  if (!update) return next();
+
+  if ("password" in update) {
+    const password = update.password;
+    update.password = await hashPassword(password);
+    this.setUpdate(update);
+  }
+
   next();
 });
 const User: Model<IUser> = mongoose.model<IUser>("User", userSchema);
