@@ -3,7 +3,7 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./build/app.js",
+    "start": "node --env-file=.env dist/src/app.js",
     "build": "npx tsc",
     "dev": "nodemon ./src/app.ts"
   },
